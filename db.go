@@ -30,7 +30,7 @@ func Connect(url string) (*Db, error) {
 }
 
 func (r *Db) Close() {
-	r.Close()
+	r.db.Close()
 }
 
 func (r *Db) AddAccount(account Account) error {

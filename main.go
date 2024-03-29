@@ -2,12 +2,19 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"github.com/nats-io/nats.go"
 	"log"
 	"os"
+	"runtime"
 )
 
 func main() {
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatalln(err)
+		return
+	}
 
 	config, err := getConfig()
 	if err != nil {
@@ -18,6 +25,7 @@ func main() {
 	db, err := Connect(config.PostgresUrl)
 	if err != nil {
 		log.Fatalln(err)
+		return
 	}
 	defer db.Close()
 
@@ -46,4 +54,17 @@ func main() {
 		return
 	}
 
+	listSub, err := nc.Subscribe("accounts.minecraft.list", func(msg *nats.Msg) {
+		if err := listAccounts(nc, db, msg); err != nil {
+			log.Fatalln(err)
+		}
+	})
+	defer listSub.Unsubscribe()
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	// Keep the program running
+	runtime.Goexit()
 }
