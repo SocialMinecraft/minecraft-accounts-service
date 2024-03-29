@@ -46,6 +46,18 @@ func (r *Db) AddAccount(account Account) error {
 	return err
 }
 
+func (r *Db) UpdateAccount(account Account) error {
+
+	_, err := r.db.Query(
+		"UPDATE accounts SET minecraft_username = $1, is_main = $2 WHERE id = $3",
+		account.MinecraftUsername,
+		account.IsMain,
+		account.Id,
+	)
+
+	return err
+}
+
 func (r *Db) DeleteAccount(id int) error {
 
 	_, err := r.db.Query(
