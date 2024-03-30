@@ -11,7 +11,7 @@ RUN go build -v -o /usr/local/bin/app ./
 
 CMD ["app"]
 
-#docker build --no-cache -t dmgarvis/minecraft-accounts-service:latest .
+#docker build --platform linux/amd64 --no-cache -t dmgarvis/minecraft-accounts-service:latest .
 #docker push dmgarvis/minecraft-accounts-service:latest
 
 #docker run --env-file .env dmgarvis/minecraft-accounts-service:latest
