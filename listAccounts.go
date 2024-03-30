@@ -27,6 +27,7 @@ func listAccounts(nc *nats.Conn, db *Db, msg *nats.Msg) error {
 			MinecraftUuid:     account.MinecraftUuid,
 			MinecraftUsername: account.MinecraftUsername,
 			IsMain:            account.IsMain,
+			FirstName:         account.FirstName,
 		})
 	}
 	if buf, err = proto.Marshal(re); err != nil {

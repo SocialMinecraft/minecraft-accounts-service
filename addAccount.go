@@ -57,7 +57,7 @@ func addAccount(nc *nats.Conn, db *Db, msg *nats.Msg) error {
 		return msg.Respond(buf)
 	}
 	if res.StatusCode == 429 {
-		errMsg := "User System is overload, please try again in a minute"
+		errMsg := "Minecraft Account Lookup is overload, please try again in a minute"
 		re := &protos.ChangeMinecraftAccountResponse{}
 		re.Success = false
 		re.ErrorMessage = &errMsg
@@ -98,7 +98,7 @@ func addAccount(nc *nats.Conn, db *Db, msg *nats.Msg) error {
 		if err != nil {
 			return err
 		}
-		_, err = nc.Request("minecraft.whitelist.add", buf, time.Second*3)
+		_, err = nc.Request("minecraft.whitelist.add", buf, time.Second*1)
 		if err != nil {
 			return err
 		}
@@ -111,6 +111,7 @@ func addAccount(nc *nats.Conn, db *Db, msg *nats.Msg) error {
 	account.UserId = e.UserId
 	account.MinecraftUsername = e.MinecraftUsername
 	account.MinecraftUuid = uuid
+	account.FirstName = e.FirstName
 	err = db.AddAccount(account)
 	if err != nil {
 		return err
@@ -133,10 +134,15 @@ func addAccount(nc *nats.Conn, db *Db, msg *nats.Msg) error {
 			MinecraftUuid:     uuid,
 			MinecraftUsername: e.MinecraftUsername,
 			IsMain:            isMain,
+			FirstName:         e.FirstName,
 		},
 	})
 	if err != nil {
 		return err
 	}
+
+	//log.Println(base64.StdEncoding.EncodeToString(buf))
+
 	return nc.Publish("accounts.minecraft.changed", buf)
+
 }

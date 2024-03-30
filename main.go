@@ -9,6 +9,14 @@ import (
 	"runtime"
 )
 
+var (
+	nc        *nats.Conn
+	addSub    *nats.Subscription
+	removeSub *nats.Subscription
+	listSub   *nats.Subscription
+	db        *Db
+)
+
 func main() {
 
 	if err := godotenv.Load(); err != nil {
@@ -22,49 +30,56 @@ func main() {
 		os.Exit(1)
 	}
 
-	db, err := Connect(config.PostgresUrl)
+	db, err = Connect(config.PostgresUrl)
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
-	defer db.Close()
+	//defer db.Close()
 
-	nc, err := nats.Connect(config.NatsUrl)
-	defer nc.Drain()
+	nc, err = nats.Connect(config.NatsUrl)
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+	//defer nc.Drain()
 
-	addSub, err := nc.Subscribe("accounts.minecraft.add", func(msg *nats.Msg) {
+	addSub, err = nc.Subscribe("accounts.minecraft.add", func(msg *nats.Msg) {
+		log.Println("Got Account Add Request")
 		if err := addAccount(nc, db, msg); err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 	})
-	defer addSub.Unsubscribe()
+	//defer addSub.Unsubscribe()
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
 
-	removeSub, err := nc.Subscribe("accounts.minecraft.remove", func(msg *nats.Msg) {
+	removeSub, err = nc.Subscribe("accounts.minecraft.remove", func(msg *nats.Msg) {
+		log.Println("Got Account Remove Request")
 		if err := removeAccount(nc, db, msg); err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 	})
-	defer removeSub.Unsubscribe()
+	//defer removeSub.Unsubscribe()
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
-
-	listSub, err := nc.Subscribe("accounts.minecraft.list", func(msg *nats.Msg) {
+	listSub, err = nc.Subscribe("accounts.minecraft.list", func(msg *nats.Msg) {
+		log.Println("Got Account List Request")
 		if err := listAccounts(nc, db, msg); err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
 	})
-	defer listSub.Unsubscribe()
+	//defer listSub.Unsubscribe()
 	if err != nil {
 		log.Fatalln(err)
 		return
 	}
 
+	log.Println("Running")
 	// Keep the program running
 	runtime.Goexit()
 }
