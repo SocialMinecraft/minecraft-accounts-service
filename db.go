@@ -75,7 +75,7 @@ func (r *Db) GetAccountByUsername(username string) (*Account, error) {
 	var re Account
 
 	err := r.db.QueryRow(
-		"SELECT id, user_id, first_name, accounts.minecraft_uuid, minecraft_username, is_main FROM accounts WHERE minecraft_username = $1",
+		"SELECT id, user_id, first_name, accounts.minecraft_uuid, minecraft_username, is_main FROM accounts WHERE LOWER(minecraft_username) = LOWER($1)",
 		username,
 	).Scan(
 		&re.Id,

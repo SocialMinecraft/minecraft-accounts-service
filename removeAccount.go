@@ -71,6 +71,7 @@ func removeAccount(nc *nats.Conn, db *Db, msg *nats.Msg) error {
 			MinecraftUuid:     existingAccount.MinecraftUuid,
 			MinecraftUsername: existingAccount.MinecraftUsername,
 			IsMain:            existingAccount.IsMain,
+			FirstName:         existingAccount.FirstName,
 		},
 	})
 	if err != nil {
@@ -121,6 +122,7 @@ func UpdateUsersMain(nc *nats.Conn, db *Db, userId string) error {
 			MinecraftUuid:     account.MinecraftUuid,
 			MinecraftUsername: account.MinecraftUsername,
 			IsMain:            account.IsMain,
+			FirstName:         account.FirstName,
 		},
 	})
 	if err != nil {
